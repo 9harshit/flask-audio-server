@@ -1,0 +1,218 @@
+{% extends "layout.html" %}
+{% block content %}
+<style type="text/css">
+tr, button
+{
+  padding: 15px;
+	color: #ffffff;
+}
+h4{
+	background: #000000;
+}
+button:hover {
+  background: #62b778;
+}
+button 
+{
+	border: 2px solid #000000;
+	background: #62cf78;
+}
+input
+{ background: #282828;
+	color: #ffffff;
+}
+table
+{
+	padding: 250px;
+	position: relative;
+}
+.files input {
+    outline: 2px dashed #92b0b3;
+    outline-offset: -10px;
+    -webkit-transition: outline-offset .15s ease-in-out, background-color .15s linear;
+    transition: outline-offset .15s ease-in-out, background-color .15s linear;
+    padding: 120px 0px 85px 35%;
+    text-align: center !important;
+    margin: 0;
+    width: 100% !important;
+    background: #404040;
+}
+.files input:focus{     outline: 2px dashed #92b0b3;  outline-offset: -10px;
+    -webkit-transition: outline-offset .15s ease-in-out, background-color .15s linear;
+    transition: outline-offset .15s ease-in-out, background-color .15s linear; border:1px solid #92b0b3;
+ }
+.file{ position:relative
+}
+.files:after {  pointer-events: none;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 50px;
+    right: 0;
+    height: 56px;
+    content: "";
+    background-image: url(https://image.flaticon.com/icons/png/128/109/109612.png);
+    display: block;
+    margin: 0 auto;
+    background-size: 100%;
+    background-repeat: no-repeat;
+}
+.color input{ background-color:#f1f1f1;}
+
+.modal {
+  display: block;
+  color: #62cf78;
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content/Box */
+.modal-content {
+  background-color: #161616;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+}
+
+/* The Close Button */
+.close {
+  color: #62cf78;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #62b778;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+input[type='file'] {
+  color: transparent;
+}
+
+</style>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+<!--     {% for msg in messages %}
+      <p>{{msg}}</p>
+    {% endfor %} -->
+    <p>{{messages[-1]}}</p>
+  {% endif %}
+{% endwith %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<select id="state" name="state">
+  <option value="">--- Please Select ---</option>
+  <option value="song">Song</option>
+  <option value="podcast">Podcast</option>
+  <option value="audiobook">AudioBook</option>
+</select>
+
+
+	<form enctype="multipart/form-data" id="form-song" class="state-form" style="display:none;" method="POST">
+  <hr>Song
+  <hr>
+  <div class="form-group">
+    <label >ID</label>
+    <input  hidden type="text" name="type" value = "song">
+    <input type="number" class="form-control" name="id" placeholder="Enter Song ID" required>
+        <label >Name</label>
+    <input type="text" class="form-control" name="name" placeholder="Enter Song Name" required maxlength = "100">
+    <label >Duration of Song</label>
+    <input type="number" class="form-control" name="duration" placeholder="Enter Duration in mintues" required min = "0">
+    <input name="audio" id = "audio" accept="audio/*" title="Upload File" type="file" required="">
+
+  </div>
+<button type="submit">Upload File</button>
+
+</form>
+
+<form enctype="multipart/form-data" id="form-podcast" class="state-form" style="display:none;" method="POST">
+
+  <hr> Podcast
+  <hr>
+  <div class="form-group">
+    <label >ID</label>
+    <input  hidden type="text" name="type" value = "podcast">
+    <input type="number" class="form-control" name="id" placeholder="Enter Podcast ID" required>
+        <label >Name</label>
+    <input type="text" class="form-control" name="name" placeholder="Enter Podcast Name" required maxlength = "100">
+    <label >Duration of Podcast</label>
+    <input type="number" class="form-control" name="duration" placeholder="Enter Duration in mintues" required min = "0">
+
+        <label >Host</label>
+    <input type="text" class="form-control" name="host" placeholder="Enter Host Name" required maxlength = "100">
+        <label >Participants</label>
+    <input type="textarea" class="form-control" name="participants" placeholder="Enter Participants Name" maxlength = "100">
+    <input name="audio"  id="audio" accept="audio/*" title="Upload File" type="file">
+
+  </div>
+  <button type="submit">Upload File</button>
+
+</form>
+
+<form enctype="multipart/form-data" id="form-audiobook" class="state-form" style="display:none;" method="POST">
+
+  <hr> AudioBook
+  <hr>
+  <div class="form-group">
+    <label >ID</label>
+    <input  hidden type="text" name="type" value = "audiobook">
+    <input type="number" class="form-control" name="id" placeholder="Enter audiobook ID" required>
+        <label >Title</label>
+    <input type="text" class="form-control" name="name" placeholder="Enter Title Name" required maxlength = "100">
+        <label >Author</label>
+    <input type="text" class="form-control" name="author" placeholder="Enter Author Name" required maxlength = "100">
+
+        <label >Narrator</label>
+    <input type="text" class="form-control" name="narrator" placeholder="Enter Host Name" required maxlength = "100">
+        <label >Duration of Audiobook</label>
+    <input type="number" class="form-control" name="duration" placeholder="Enter Duration in seconds" required min = "0">
+    <input name="audio"  id="audio" accept="audio/*" title="Upload File" type="file">
+
+  </div>
+  <button type="submit">Upload File</button>
+
+</form>
+  </div>
+  <table>
+      </th>
+	</tr>
+			<tr align="center">
+				<th >
+					  
+				</th>
+			</tr>
+</table>
+
+<script type="text/javascript">
+$("#state").change(function() {
+  let state = this.value; //get state
+
+  $('.state-form').hide(); //hide all forms
+
+  $("#form-" + state).show(); //show only related form
+});
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	{% endblock %}
+
+
+
+
+
+
+
