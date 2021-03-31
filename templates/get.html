@@ -3,9 +3,9 @@
 
 {% for item in value %}
 	<p>Id : {{item.id}}, Type : {{item.type}}, Name : {{item.name}},Duration : {{item.duration}},Upload Time : {{item.uploadtime}}, Host : {{item.host}}, Participants : {{item.participants}}, Author : {{item.author}}, Author : {{item.narrator}}, File :  <audio controls >
-  <source src=" {{ item.audio_file }}" type="audio/mpeg">
+  <source src=" {{item.audio_file}}" type="audio/mpeg">
 Your browser does not support the audio element.
-</audio> </p>	
+</audio> 
 {% endfor %}
 
 {% endblock %}

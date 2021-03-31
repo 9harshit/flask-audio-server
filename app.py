@@ -1,6 +1,7 @@
 # Importing libaries
 
-from flask import Flask, redirect, url_for, render_template, request, session, flash
+import sys
+from flask import Flask, redirect, url_for, render_template, request, session, flash, Response, send_file
 import datetime
 
 import os
@@ -12,7 +13,7 @@ app = Flask(__name__)
 
 app.secret_key = "your secret key"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///audio.sqlite3"
-app.config["SQLALCHEMY_TRACK_MODIFICATION"] = False
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # create directory to save audio file locally
 
@@ -90,8 +91,9 @@ def home():
 
             audio_file.save(os.path.join(uploads_dir, audio_file.filename))
             path = os.path.join(uploads_dir, audio_file.filename)
-            print(path, type(path))
-            file["audio_file"] = str(path)
+            print(path, type(path), file=sys.stderr)
+
+            file["audio_file"] =  "/uploads/" + audio_file.filename
             file["uploadtime"] = datetime.datetime.now()
             file["host"] = ""
             file["participants"] = ""
@@ -161,11 +163,11 @@ def home():
 # GET API
 
 
-@app.route("/get/<atype>/<aid>", methods=["GET"])
 
 # if url contains both file type and file id
 
 
+@app.route("/get/<atype>/<aid>", methods=["GET"])
 def find_file(atype, aid):
 
     # qurey to retrieve file from database
@@ -204,6 +206,20 @@ def find_all(atype):
         flash("File not present in Database")
         return render_template("home.html")
 
+# to get audio file back from folder to html 
+# creating a url path to the file
+
+@app.route("/uploads/<filename>", methods=["GET"])
+def return_audio_file(filename):
+    print("Request for file: ", filename, file=sys.stderr)
+    def generate():
+        with open(f"{uploads_dir}/{filename}", "rb") as song:
+            data = song.read(1024)
+            while data:
+                yield data
+                data = song.read(1024)
+    return Response(generate(), mimetype="audio/mpeg")
+
 
 # DELETE API
 
@@ -229,9 +245,7 @@ def delete_file(atype, aid):
 # UPDATE API
 
 
-@app.route(
-    "/update/<atype>/<aid>", methods=["POST", "GET"]
-)  # this sets the route to this page
+@app.route("/update/<atype>/<aid>", methods=["POST", "GET"])  # this sets the route to this page
 def update(atype, aid):
 
     if request.method == "POST":
@@ -248,9 +262,9 @@ def update(atype, aid):
 
             audio_file.save(os.path.join(uploads_dir, audio_file.filename))
             path = os.path.join(uploads_dir, audio_file.filename)
-            # print(path, type(path))
+            print(path, type(path), file=sys.stderr)
 
-            file["audio_file"] = str(path)
+            file["audio_file"] =  "/uploads/" + audio_file.filename
             file["uploadtime"] = datetime.datetime.now()
             file["host"] = ""
             file["participants"] = ""
@@ -309,6 +323,8 @@ def update(atype, aid):
         return render_template("update.html", type=atype, id=aid)
 
 
+
+
 if __name__ == "__main__":
     db.create_all()
-    app.run(debug=False)
+    app.run(debug=True) 
