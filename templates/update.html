@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 
+
 {% with messages = get_flashed_messages() %}
   {% if messages %}
 <!--     {% for msg in messages %}
@@ -10,15 +11,9 @@
   {% endif %}
 {% endwith %}
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-<select id="state" name="state">
-  <option value = "" >--- Please Select ---</option>
-  <option value="song">Song</option>
-  <option value="podcast">Podcast</option>
-  <option value="audiobook">AudioBook</option>
-</select>
 
-	<form enctype="multipart/form-data" id="form-song" class="state-form" style="display:none;" method="POST">
+{% if type == "song" %}
+	<form enctype="multipart/form-data"  class="state-form"  method="POST">
   <hr>Song
   <hr>
   <div class="form-group">
@@ -35,8 +30,10 @@
 <button type="submit">Upload File</button>
 
 </form>
+{% endif %}
 
-<form enctype="multipart/form-data" id="form-podcast" class="state-form" style="display:none;" method="POST">
+{% if type == "podcast" %}
+<form enctype="multipart/form-data" class="state-form" method="POST">
 
   <hr> Podcast
   <hr>
@@ -59,8 +56,10 @@
   <button type="submit">Upload File</button>
 
 </form>
+{% endif %}
 
-<form enctype="multipart/form-data" id="form-audiobook" class="state-form" style="display:none;" method="POST">
+{% if type == "audiobook" %}
+<form enctype="multipart/form-data" class="state-form" method="POST">
 
   <hr> AudioBook
   <hr>
@@ -83,6 +82,7 @@
   <button type="submit">Upload File</button>
 
 </form>
+{% endif %}
 
   </div>
   <table>

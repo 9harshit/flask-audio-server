@@ -6,18 +6,25 @@ import os
 
 from flask_sqlalchemy import SQLAlchemy
 
+
 app = Flask(__name__)
+
 app.secret_key = "your secret key"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///audio.sqlite3"
 app.config["SQLALCHEMY_TRACK_MODIFICATION"] = False
 
-db = SQLAlchemy(app)
 
 uploads_dir = os.path.join(app.instance_path, 'uploads')
 if os.path.exists(uploads_dir):
     pass
 else:
     os.makedirs(uploads_dir)
+
+
+
+db = SQLAlchemy(app)
+
+
 
 class audio(db.Model):
     id = db.Column("id", db.Integer, primary_key=True)
@@ -57,9 +64,14 @@ class audio(db.Model):
 
 
 @app.route("/")
-@app.route("/", methods=["POST"])  # this sets the route to this page
+@app.route("/", methods=["POST", "GET"])  # this sets the route to this page
 def home():
+    session["type"] = None
+    session["id"] = None
+
+
     if request.method == "POST":
+
         if request.files:
             file = {}
             file["id"] = request.form["id"]
@@ -167,62 +179,76 @@ def delete_file(atype,aid):
     return render_template("home.html")
 
 
-# @app.route("/update/<atype>/<aid>", methods=["POST"])  # this sets the route to this page
-# def update(atype, aid):
-#     if request.method == "POST":
-#         if request.files:
-#             id = request.form["id"]
-#             name = request.form["name"]
-#             duration = request.form["duration"]
-#             audio_file = request.files["audio"].read()
-#             uploadtime = datetime.datetime.now()
-#             host = ""
-#             participants = ""
-#             author = ""
-#             narrator = ""
+@app.route("/update/<atype>/<aid>", methods=["POST", "GET"])  # this sets the route to this page
+def update(atype, aid):   
 
-#             if request.form["type"] == "song":
-#                 type = "song"
-#                 print("song")
+    if request.method == "POST":
 
-#             if request.form["type"] == "podcast":
+        if request.files:
+            file = {}
+            file["id"] = request.form["id"]
+            file["name"] = request.form["name"]
+            file["duration"] = request.form["duration"] 
+            audio_file = request.files["audio"]
 
-#                 type = "podcast"
-#                 host = request.form["host"]
-#                 participants = request.form["participants"]
+            audio_file.save(os.path.join(uploads_dir, audio_file.filename))
+            path = os.path.join(uploads_dir, audio_file.filename)
+            print(path, type(path))
+            file["audio_file"] = str(path)
+            file["uploadtime"] = datetime.datetime.now()
+            file["host"] = ""
+            file["participants"] = ""
+            file["author"] = ""
+            file["narrator"] = ""
 
-#                 print("podcast")
+            if request.form["type"] == "song":
+                file["type"] = "song"
+                print("song")
 
-#             if request.form["type"] == "audiobook":
-#                 type = "audiobook"
-#                 author = request.form["author"]
-#                 narrator = request.form["narrator"]
+            if request.form["type"] == "podcast":
 
-#                 print("audiobook")
+                file["type"] = "podcast"
+                file["host"] = request.form["host"]
+                file["participants"] = request.form["participants"]
 
-#             print(id, name, duration, uploadtime, type)
+                print("podcast")
 
-#             found_audio = audio.query.filter_by(id = id, name = name).first()
-#             found_audio2 = audio.query.filter_by(id = aid, name = aname).first()
+            if request.form["type"] == "audiobook":
+                file["type"] = "audiobook"
+                file["author"] = request.form["author"]
+                file["narrator"] = request.form["narrator"]
 
-#             if found_audio or found_audio2:
-#                 if found_audio:
-#                     found_audio.
+                print("audiobook")
 
-#                 else:
+            found_audio = audio.query.filter_by(id = int(aid), type = atype).first()
 
+            if found_audio:
+                found_audio.name = file["name"]
+                found_audio.duration = file["duration"]
+                found_audio.uploadtime = file["uploadtime"]
+                found_audio.host=file["host"]
+                found_audio.participants = file["participants"]
+                found_audio.author = file["author"]
+                found_audio.narrator = file["narrator"]
+                found_audio.audio_file =  file["audio_file"]
+                
+            #db.session.add(aud)
+                db.session.flush()
+                db.session.commit()
 
-#             else:
-#                 print("File not found")
+                flash("File Update")
+            
+            else:
+                flash("File not found")
 
-#             return render_template("home.html")
+            return render_template("home.html")
 
-#         else:
-#             print("File not found")
-#             return render_template("home.html")
+        else:
+            flash("Audio File not found")
+            return render_template("home.html")
 
-#     else:
-#         return render_template("home.html")
+    else:
+        return render_template("update.html", type = atype, id =aid)
 
 
 if __name__ == "__main__":
