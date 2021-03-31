@@ -104,4 +104,4 @@
   
   API Calls are same as mentioned above for localhost with `https://flask-audio-server.herokuapp.com/` url instead of localhost url
 
-***Note : Audio format issues with Safari. Run with Chrome
+***Note : Audio format issues with Safari. Run with Chrome***
