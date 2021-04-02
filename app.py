@@ -149,11 +149,11 @@ def home():
 
                 flash("Data Entered", "info")
 
-            return render_template("home.html")
+            return redirect(url_for('home'))
 
         else:
             flash("Audio file not found")
-            return render_template("home.html")
+            return redirect(url_for('home'))
 
     else:
         # Rendering page
@@ -183,7 +183,7 @@ def find_file(atype, aid):
     # No file is retrieved
     else:
         flash("File not present in Database")
-        return render_template("home.html")
+        return redirect(url_for('home'))
 
 
 # if url contains only file type
@@ -204,7 +204,7 @@ def find_all(atype):
 
     else:
         flash("File not present in Database")
-        return render_template("home.html")
+        return redirect(url_for('home'))
 
 # to get audio file back from folder to html 
 # creating a url path to the file
@@ -239,7 +239,7 @@ def delete_file(atype, aid):
         flash("File does not exists")
 
     # Returing to home page
-    return render_template("home.html")
+    return redirect(url_for('home'))
 
 
 # UPDATE API
@@ -312,11 +312,11 @@ def update(atype, aid):
             else:
                 flash("File not found")
 
-            return render_template("home.html")
+            return redirect(url_for('home'))
 
         else:
             flash("Audio File not found")
-            return render_template("home.html")
+            return redirect(url_for('home'))
 
     else:
         # redering page based on type of file mentioned in url
